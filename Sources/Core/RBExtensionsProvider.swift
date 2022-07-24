@@ -20,9 +20,7 @@ public struct EDS<Base> {
 
 extension UIScrollView: RBExtensionsProvider { }
 
-
 public extension EDS where Base: UIScrollView {
-
   func setDataSource(_ dataSource: RBEmptyDataSource?) {
     base.emptyDataSource = dataSource
   }

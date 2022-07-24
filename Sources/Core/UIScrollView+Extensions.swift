@@ -1,15 +1,12 @@
 import UIKit
 import ObjectiveC
 
-fileprivate var emptyBackgroundViewKey: UInt8 = 0
-
 extension UIScrollView {
   private struct AssociatedKeys {
-   static var kEmptyBackgroundView = "RBEmptyBackgroundView"
+    static var kEmptyBackgroundView = "RBEmptyBackgroundView"
     static var kEmptyDataSource = "RBEmptyDataSource"
     static var kEmptyDelegate = "RBEmptyDelegate"
     static var kContentSizeObserveToken = "RBContentSizeObserveToken"
-//    var kConfigureEmptyDataSetView =    "configureEmptyDataSetView"
   }
   
   var emptyBackgroundView: RBEmptyBackgroundView? {
@@ -67,10 +64,10 @@ extension UIScrollView {
   }
   
   public var emptyDataSource: RBEmptyDataSource? {
-      get {
-        let container = objc_getAssociatedObject(self, &AssociatedKeys.kEmptyDataSource) as? WeakObjectContainer
-          return container?.weakObject as? RBEmptyDataSource
-      }
+    get {
+      let container = objc_getAssociatedObject(self, &AssociatedKeys.kEmptyDataSource) as? WeakObjectContainer
+      return container?.weakObject as? RBEmptyDataSource
+    }
     set {
       if newValue == nil {
         token?.invalidate()
@@ -80,20 +77,20 @@ extension UIScrollView {
       
       objc_setAssociatedObject(self, &AssociatedKeys.kEmptyDataSource, WeakObjectContainer(with: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
       performObserving()
-      }
+    }
   }
   
   public var emptyDelegate: RBEmptyDelegate? {
-      get {
-        let container = objc_getAssociatedObject(self, &AssociatedKeys.kEmptyDelegate) as? WeakObjectContainer
-          return container?.weakObject as? RBEmptyDelegate
+    get {
+      let container = objc_getAssociatedObject(self, &AssociatedKeys.kEmptyDelegate) as? WeakObjectContainer
+      return container?.weakObject as? RBEmptyDelegate
+    }
+    set {
+      if newValue == nil {
+        //              self.invalidate()
       }
-      set {
-          if newValue == nil {
-//              self.invalidate()
-          }
-        objc_setAssociatedObject(self, &AssociatedKeys.kEmptyDelegate, WeakObjectContainer(with: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-      }
+      objc_setAssociatedObject(self, &AssociatedKeys.kEmptyDelegate, WeakObjectContainer(with: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    }
   }
   
   private var token: NSKeyValueObservation? {
@@ -118,13 +115,14 @@ extension UIScrollView {
   private func observeContentSize(completion: @escaping (Bool) -> Void) {
     token = observe(\.contentSize, options: [.old, .new], changeHandler: {[weak self] scrollView, changed in
       guard let self = self else { return}
-        completion(self.itemsCount == 0)
+      completion(self.itemsCount == 0)
     })
   }
   
   private func showEmptyView() {
     guard emptyDataSource != nil else { return }
     if let view = emptyBackgroundView {
+      layoutIfNeeded()
       view.isHidden = false
       view.frame = frame
       if view.superview == nil {
