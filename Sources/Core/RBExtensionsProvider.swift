@@ -28,5 +28,10 @@ public extension EDS where Base: UIScrollView {
   func setDelegate(_ delegate: RBEmptyDelegate?) {
     base.emptyDelegate = delegate
   }
+  
+  func reloadData() {
+    base.hideEmptyView()
+    base.showEmptyView()
+  }
 }
 
