@@ -121,21 +121,23 @@ extension UIScrollView {
   
   private func showEmptyView() {
     guard emptyDataSource != nil else { return }
-    if let view = emptyBackgroundView {
-      layoutIfNeeded()
-      view.isHidden = false
-      view.frame = frame
-      if view.superview == nil {
-        if (self is UITableView) || (self is UICollectionView) || (subviews.count > 1) {
-          insertSubview(view, at: 0)
-        } else {
-          addSubview(view)
+    DispatchQueue.main.async {
+      if let view = self.emptyBackgroundView {
+        self.layoutIfNeeded()
+        view.isHidden = false
+        view.frame = self.frame
+        if view.superview == nil {
+          if (self is UITableView) || (self is UICollectionView) || (self.subviews.count > 1) {
+            self.insertSubview(view, at: 0)
+          } else {
+            self.addSubview(view)
+          }
         }
+        self.setView()
       }
-      setView()
+      
+      self.isScrollEnabled = false
     }
-    
-    isScrollEnabled = false
   }
   
   private func hideEmptyView() {
