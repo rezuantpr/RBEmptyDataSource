@@ -62,6 +62,7 @@ class RBEmptyBackgroundView: UIView {
            headerView: UIView?,
            headerViewSize: CGSize = .zero,
            buttonTitle: NSAttributedString?,
+           buttonHighlightedTitle: NSAttributedString?,
            didTapButton: ((UIButton) -> ())?) {
     if let customView = customView {
       addSubview(customView)
@@ -79,6 +80,8 @@ class RBEmptyBackgroundView: UIView {
       detailLabel.isHidden = detail == nil
       
       button.setAttributedTitle(buttonTitle, for: .normal)
+      let highlightedTitle = buttonHighlightedTitle ?? buttonTitle
+      button.setAttributedTitle(highlightedTitle, for: .highlighted)
       button.isHidden = buttonTitle == nil
       
       if let headerView = headerView {

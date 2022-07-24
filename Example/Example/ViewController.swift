@@ -88,6 +88,21 @@ extension ViewController: RBEmptyDataSource {
     ])
   }
   
+  func buttonTitle(_ scrollView: UIScrollView, for state: UIControl.State) -> NSAttributedString? {
+    switch state {
+    case .normal:
+      return NSAttributedString(string: "Click me!", attributes: [
+        .foregroundColor: UIColor.red
+      ])
+    case .highlighted:
+      return NSAttributedString(string: "Click me!", attributes: [
+        .foregroundColor: UIColor.blue
+      ])
+    default:
+      return nil
+    }
+  }
+  
   func topOffset(_ scrollView: UIScrollView) -> CGFloat {
     return 32
   }

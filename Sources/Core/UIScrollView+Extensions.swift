@@ -154,7 +154,8 @@ extension UIScrollView {
     let topOffset = emptyDataSource.topOffset(self)
     let title = emptyDataSource.title(self)
     let detail = emptyDataSource.detail(self)
-    let buttonTitle = emptyDataSource.buttonTitle(self)
+    let buttonTitle = emptyDataSource.buttonTitle(self, for: .normal)
+    let buttonHighlightedTitle = emptyDataSource.buttonTitle(self, for: .highlighted)
     let headerView = emptyDataSource.headerView(self)
     let headerViewSize = emptyDataSource.headerViewSize(self)
     let customView = emptyDataSource.customView(self)
@@ -171,6 +172,7 @@ extension UIScrollView {
                              headerView: headerView,
                              headerViewSize: headerViewSize,
                              buttonTitle: buttonTitle,
+                             buttonHighlightedTitle: buttonHighlightedTitle,
                              didTapButton: didTapButton)
   }
 }
