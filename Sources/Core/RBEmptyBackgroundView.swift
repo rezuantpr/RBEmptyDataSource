@@ -63,6 +63,7 @@ class RBEmptyBackgroundView: UIView {
            headerViewSize: CGSize = .zero,
            buttonTitle: NSAttributedString?,
            buttonHighlightedTitle: NSAttributedString?,
+           spacing: CGFloat = 8,
            didTapButton: ((UIButton) -> ())?) {
     if let customView = customView {
       addSubview(customView)
@@ -100,6 +101,8 @@ class RBEmptyBackgroundView: UIView {
           equalTo: headerContainerView.bottomAnchor,
           constant: 0).isActive = true
       }
+      
+      contentView.spacing = spacing
       headerContainerView.isHidden = headerView == nil
       
       headerContainerView.heightAnchor.constraint(equalToConstant: headerViewSize.height).isActive = true

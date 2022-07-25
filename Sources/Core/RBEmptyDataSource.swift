@@ -8,6 +8,7 @@ public protocol RBEmptyDataSource: AnyObject {
   func headerView(_ scrollView: UIScrollView) -> UIView?
   func headerViewSize(_ scrollView: UIScrollView) -> CGSize
   func customView(_ scrollView: UIScrollView) -> UIView?
+  func spacing(_ scrollView: UIScrollView) -> CGFloat
 }
 
 public extension RBEmptyDataSource {
@@ -18,4 +19,5 @@ public extension RBEmptyDataSource {
   func headerView(_ scrollView: UIScrollView) -> UIView? { nil }
   func headerViewSize(_ scrollView: UIScrollView) -> CGSize { CGSize(width: 200, height: 200)}
   func customView(_ scrollView: UIScrollView) -> UIView? { nil }
+  func spacing(_ scrollView: UIScrollView) -> CGFloat { 8 }
 }

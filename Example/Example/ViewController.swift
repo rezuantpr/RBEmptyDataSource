@@ -106,6 +106,10 @@ extension ViewController: RBEmptyDataSource {
   func topOffset(_ scrollView: UIScrollView) -> CGFloat {
     return 32
   }
+  
+  func spacing(_ scrollView: UIScrollView) -> CGFloat {
+    return 16
+  }
 }
 
 extension ViewController: RBEmptyDelegate {

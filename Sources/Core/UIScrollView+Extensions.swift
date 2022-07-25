@@ -143,6 +143,7 @@ extension UIScrollView {
     let headerView = emptyDataSource.headerView(self)
     let headerViewSize = emptyDataSource.headerViewSize(self)
     let customView = emptyDataSource.customView(self)
+    let spacing = emptyDataSource.spacing(self)
     
     let didTapButton: (UIButton) -> Void = { [weak self] button in
       guard let self = self else { return }
@@ -157,6 +158,7 @@ extension UIScrollView {
                              headerViewSize: headerViewSize,
                              buttonTitle: buttonTitle,
                              buttonHighlightedTitle: buttonHighlightedTitle,
+                             spacing: spacing,
                              didTapButton: didTapButton)
   }
   
