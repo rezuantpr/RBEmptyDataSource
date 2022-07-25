@@ -112,4 +112,12 @@ extension ViewController: RBEmptyDelegate {
   func emptyDataSource(_ scrollView: UIScrollView, didTapButton button: UIButton) {
     print("TAPPED")
   }
+  
+  func emptyDataSourceWillAppear(_ scrollView: UIScrollView) {
+    print(#function)
+  }
+  
+  func emptyDataSourceWillDisappear(_ scrollView: UIScrollView) {
+    print(#function)
+  }
 }

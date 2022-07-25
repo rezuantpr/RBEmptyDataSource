@@ -7,6 +7,7 @@ extension UIScrollView {
     static var kEmptyDataSource = "RBEmptyDataSource"
     static var kEmptyDelegate = "RBEmptyDelegate"
     static var kContentSizeObserveToken = "RBContentSizeObserveToken"
+    static var kItemsCount = "RBEmptyDataSourceItemsCount"
   }
   
   var emptyBackgroundView: RBEmptyBackgroundView? {
@@ -29,38 +30,13 @@ extension UIScrollView {
     }
   }
   
-  var itemsCount: Int {
-    var items = 0
-    
-    if let tableView = self as? UITableView {
-      var sections = 1
-      
-      if let dataSource = tableView.dataSource {
-        if dataSource.responds(to: #selector(UITableViewDataSource.numberOfSections(in:))) {
-          sections = dataSource.numberOfSections!(in: tableView)
-        }
-        if dataSource.responds(to: #selector(UITableViewDataSource.tableView(_:numberOfRowsInSection:))) {
-          for i in 0 ..< sections {
-            items += dataSource.tableView(tableView, numberOfRowsInSection: i)
-          }
-        }
-      }
-    } else if let collectionView = self as? UICollectionView {
-      var sections = 1
-      
-      if let dataSource = collectionView.dataSource {
-        if dataSource.responds(to: #selector(UICollectionViewDataSource.numberOfSections(in:))) {
-          sections = dataSource.numberOfSections!(in: collectionView)
-        }
-        if dataSource.responds(to: #selector(UICollectionViewDataSource.collectionView(_:numberOfItemsInSection:))) {
-          for i in 0 ..< sections {
-            items += dataSource.collectionView(collectionView, numberOfItemsInSection: i)
-          }
-        }
-      }
+  var itemsCount: Int? {
+    get {
+      return objc_getAssociatedObject(self, &AssociatedKeys.kItemsCount) as? Int
     }
-    
-    return items
+    set {
+      objc_setAssociatedObject(self, &AssociatedKeys.kItemsCount, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+    }
   }
   
   public var emptyDataSource: RBEmptyDataSource? {
@@ -115,7 +91,15 @@ extension UIScrollView {
   private func observeContentSize(completion: @escaping (Bool) -> Void) {
     token = observe(\.contentSize, options: [.old, .new], changeHandler: {[weak self] scrollView, changed in
       guard let self = self else { return}
-      completion(self.itemsCount == 0)
+      let oldItemNumber = self.itemsCount ?? 0
+      let newItemsNumber = self.getItemsCount()
+      if oldItemNumber == 0 && newItemsNumber != 0 {
+        self.emptyDelegate?.emptyDataSourceWillDisappear(self)
+      } else if (oldItemNumber != 0 || self.itemsCount == nil) && newItemsNumber == 0 {
+        self.emptyDelegate?.emptyDataSourceWillAppear(self)
+      }
+      self.itemsCount = newItemsNumber
+      completion(newItemsNumber == 0)
     })
   }
   
@@ -174,6 +158,40 @@ extension UIScrollView {
                              buttonTitle: buttonTitle,
                              buttonHighlightedTitle: buttonHighlightedTitle,
                              didTapButton: didTapButton)
+  }
+  
+  private func getItemsCount() -> Int {
+      var items = 0
+      
+      if let tableView = self as? UITableView {
+        var sections = 1
+        
+        if let dataSource = tableView.dataSource {
+          if dataSource.responds(to: #selector(UITableViewDataSource.numberOfSections(in:))) {
+            sections = dataSource.numberOfSections!(in: tableView)
+          }
+          if dataSource.responds(to: #selector(UITableViewDataSource.tableView(_:numberOfRowsInSection:))) {
+            for i in 0 ..< sections {
+              items += dataSource.tableView(tableView, numberOfRowsInSection: i)
+            }
+          }
+        }
+      } else if let collectionView = self as? UICollectionView {
+        var sections = 1
+        
+        if let dataSource = collectionView.dataSource {
+          if dataSource.responds(to: #selector(UICollectionViewDataSource.numberOfSections(in:))) {
+            sections = dataSource.numberOfSections!(in: collectionView)
+          }
+          if dataSource.responds(to: #selector(UICollectionViewDataSource.collectionView(_:numberOfItemsInSection:))) {
+            for i in 0 ..< sections {
+              items += dataSource.collectionView(collectionView, numberOfItemsInSection: i)
+            }
+          }
+        }
+      }
+      
+      return items
   }
 }
 
