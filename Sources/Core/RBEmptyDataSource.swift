@@ -9,6 +9,9 @@ public protocol RBEmptyDataSource: AnyObject {
   func headerViewSize(_ scrollView: UIScrollView) -> CGSize
   func customView(_ scrollView: UIScrollView) -> UIView?
   func spacing(_ scrollView: UIScrollView) -> CGFloat
+  
+  func loadingTitle(_ scrollView: UIScrollView) -> NSAttributedString?
+  func loadingCustomView(_ scrollView: UIScrollView) -> UIView?
 }
 
 public extension RBEmptyDataSource {
@@ -20,4 +23,7 @@ public extension RBEmptyDataSource {
   func headerViewSize(_ scrollView: UIScrollView) -> CGSize { CGSize(width: 200, height: 200)}
   func customView(_ scrollView: UIScrollView) -> UIView? { nil }
   func spacing(_ scrollView: UIScrollView) -> CGFloat { 8 }
+  
+  func loadingTitle(_ scrollView: UIScrollView) -> NSAttributedString? { nil }
+  func loadingCustomView(_ scrollView: UIScrollView) -> UIView? { nil }
 }

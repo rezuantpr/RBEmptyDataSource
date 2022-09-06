@@ -33,5 +33,9 @@ public extension EDS where Base: UIScrollView {
     base.hideEmptyView()
     base.showEmptyView()
   }
+  
+  func setLoading(_ loading: Bool) {
+    base.isLoading = loading
+  }
 }
 

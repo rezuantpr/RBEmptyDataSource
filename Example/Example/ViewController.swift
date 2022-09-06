@@ -11,6 +11,7 @@ class ViewController: UIViewController {
   var token2: Any?
   
   var button = UIButton()
+  var button2 = UIButton()
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -22,22 +23,40 @@ class ViewController: UIViewController {
     button.setTitle("Shuffle", for: .normal)
     button.backgroundColor = .blue
     view.addSubview(button)
-    button.frame = CGRect(x: 15, y: 200, width: 200, height: 40)
+    button.frame = CGRect(x: 15, y: 48, width: 200, height: 40)
     button.addTarget(self, action: #selector(click(sender:)), for: .touchUpInside)
     
+    
+    button2.setTitle("Loading", for: .normal)
+    button2.backgroundColor = .blue
+    view.addSubview(button2)
+    button2.frame = CGRect(x: 216, y: 48, width: 180, height: 40)
+    button2.addTarget(self, action: #selector(click2(sender:)), for: .touchUpInside)
+    
+    tableView.eds.setLoading(true)
     tableView.eds.setDataSource(self)
     tableView.eds.setDelegate(self)
   }
 
+  var isLoading = true
+  
   @objc func click(sender: Any) {
     let random = Int.random(in: 0...2)
     items = Array(repeating: "Word", count: random)
     tableView.reloadData()
+    
+  }
+  
+  @objc func click2(sender: Any) {
+    print(isLoading)
+    tableView.eds.setLoading(isLoading)
+    isLoading.toggle()
   }
   
   override func viewWillLayoutSubviews() {
     super.viewWillLayoutSubviews()
-    tableView.frame = view.safeAreaLayoutGuide.layoutFrame
+    let safeArea = view.safeAreaLayoutGuide.layoutFrame
+    tableView.frame = safeArea
   }
 }
 
@@ -110,6 +129,24 @@ extension ViewController: RBEmptyDataSource {
   func spacing(_ scrollView: UIScrollView) -> CGFloat {
     return 16
   }
+  
+  func loadingTitle(_ scrollView: UIScrollView) -> NSAttributedString? {
+    return NSAttributedString(string: "LOADING...")
+  }
+  
+  func loadingCustomView(_ scrollView: UIScrollView) -> UIView? {
+    let view = ActivityView()
+    let indicator = UIActivityIndicatorView()
+    view.addSubview(indicator)
+    indicator.translatesAutoresizingMaskIntoConstraints = false
+    indicator.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    indicator.topAnchor.constraint(equalTo: view.topAnchor, constant: 32).isActive = true
+    indicator.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+    indicator.widthAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
+    
+    indicator.startAnimating()
+    return view
+  }
 }
 
 extension ViewController: RBEmptyDelegate {
@@ -123,5 +160,12 @@ extension ViewController: RBEmptyDelegate {
   
   func emptyDataSourceWillDisappear(_ scrollView: UIScrollView) {
     print(#function)
+  }
+}
+
+
+class ActivityView: UIView {
+  deinit {
+    print("SUKA")
   }
 }

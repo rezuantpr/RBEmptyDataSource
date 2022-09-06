@@ -33,10 +33,24 @@ class RBEmptyBackgroundView: UIView {
     return button
   }()
   
-  lazy var headerContainerView: UIView = {
-    let view = UIView()
-    view.translatesAutoresizingMaskIntoConstraints = false
-    return view
+  lazy var headerContainerView: UIStackView = {
+    let stackView = UIStackView(arrangedSubviews: [])
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    stackView.axis = .vertical
+    stackView.alignment = .fill
+    stackView.distribution = .fill
+  
+    return stackView
+  }()
+  
+  lazy var customViewContainer: UIStackView = {
+    let stackView = UIStackView(arrangedSubviews: [])
+    stackView.translatesAutoresizingMaskIntoConstraints = false
+    stackView.axis = .vertical
+    stackView.alignment = .fill
+    stackView.distribution = .fill
+  
+    return stackView
   }()
     
   lazy var contentView: UIStackView = {
@@ -55,23 +69,55 @@ class RBEmptyBackgroundView: UIView {
   
   private var didTapButton: ((UIButton) -> ())?
   
-  func set(customView: UIView?,
+  var topOffset: CGFloat = 32
+  var headerViewSize: CGSize = .zero
+  
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    addSubview(contentView)
+    addSubview(customViewContainer)
+  }
+  
+  required init?(coder: NSCoder) {
+    super.init(coder: coder)
+    addSubview(contentView)
+    addSubview(customViewContainer)
+  }
+  
+  func set(customView: UIView? = nil,
            topOffset: CGFloat = 32,
-           title: NSAttributedString?,
-           detail: NSAttributedString?,
-           headerView: UIView?,
+           title: NSAttributedString? = nil,
+           detail: NSAttributedString? = nil,
+           headerView: UIView? = nil,
            headerViewSize: CGSize = .zero,
-           buttonTitle: NSAttributedString?,
-           buttonHighlightedTitle: NSAttributedString?,
+           buttonTitle: NSAttributedString? = nil,
+           buttonHighlightedTitle: NSAttributedString? = nil,
            spacing: CGFloat = 8,
-           didTapButton: ((UIButton) -> ())?) {
+           didTapButton: ((UIButton) -> ())? = nil,
+           isLoading: Bool = false,
+           loadingTitle: NSAttributedString? = nil,
+           customLoadingView: UIView? = nil) {
+    self.topOffset = topOffset
+    self.headerViewSize = headerViewSize
+    
+    if isLoading {
+      if let customView = customLoadingView {
+        customViewContainer.arrangedSubviews.forEach { $0.removeFromSuperview() }
+        customViewContainer.addArrangedSubview(customView)
+        customViewContainer.alpha = 1
+      } else {
+        titleLabel.attributedText = loadingTitle
+        titleLabel.isHidden = loadingTitle == nil
+        
+        detailLabel.isHidden = true
+        button.isHidden = true
+      }
+      return ()
+    }
     if let customView = customView {
-      addSubview(customView)
-      customView.translatesAutoresizingMaskIntoConstraints = false
-      customView.topAnchor.constraint(equalTo: topAnchor, constant: topOffset).isActive = true
-      customView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
-      customView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
-      customView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
+      customViewContainer.arrangedSubviews.forEach { $0.removeFromSuperview() }
+      customViewContainer.addArrangedSubview(customView)
+      customViewContainer.alpha = 1
     } else {
       self.didTapButton = didTapButton
       titleLabel.attributedText = title
@@ -85,58 +131,21 @@ class RBEmptyBackgroundView: UIView {
       button.setAttributedTitle(highlightedTitle, for: .highlighted)
       button.isHidden = buttonTitle == nil
       
+      headerContainerView.arrangedSubviews.forEach { $0.removeFromSuperview() }
       if let headerView = headerView {
-        headerContainerView.addSubview(headerView)
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.topAnchor.constraint(
-          equalTo: headerContainerView.topAnchor,
-          constant: topOffset).isActive = true
-        headerView.leadingAnchor.constraint(
-          equalTo: headerContainerView.leadingAnchor,
-          constant: 0).isActive = true
-        headerView.trailingAnchor.constraint(
-          equalTo: headerContainerView.trailingAnchor,
-          constant: 0).isActive = true
-        headerView.bottomAnchor.constraint(
-          equalTo: headerContainerView.bottomAnchor,
-          constant: 0).isActive = true
+        headerContainerView.addArrangedSubview(headerView)
       }
       
       contentView.spacing = spacing
       headerContainerView.isHidden = headerView == nil
       
-      headerContainerView.heightAnchor.constraint(equalToConstant: headerViewSize.height).isActive = true
-      headerContainerView.widthAnchor.constraint(equalToConstant: headerViewSize.width).isActive = true
-      
-        addSubview(contentView)
-      contentView.topAnchor.constraint(equalTo: topAnchor, constant: topOffset).isActive = true
-      contentView.leadingAnchor.constraint(equalTo: leadingAnchor, constant: 0).isActive = true
-      contentView.trailingAnchor.constraint(equalTo: trailingAnchor, constant: 0).isActive = true
-      contentView.bottomAnchor.constraint(equalTo: bottomAnchor, constant: 0).isActive = true
-      
-      titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
-                                          constant: 16).isActive = true
-      titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
-                                           constant: -16).isActive = true
-      detailLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
-                                           constant: 16).isActive = true
-      detailLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
-                                           constant: -16).isActive = true
-      button.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
-                                           constant: 16).isActive = true
-      button.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
-                                           constant: -16).isActive = true
-      
     }
     
     layoutIfNeeded()
+    setNeedsUpdateConstraints()
   }
   
   func prepareForReuse() {
-    subviews.forEach {
-      $0.removeFromSuperview()
-    }
-    
       titleLabel.attributedText = nil
       titleLabel.isHidden = true
       
@@ -145,13 +154,53 @@ class RBEmptyBackgroundView: UIView {
       
       button.setTitle(nil, for: .normal)
       button.isHidden = true
-      
-    headerContainerView.subviews.forEach {
-      $0.removeFromSuperview()
-    }
-    
+        
+    headerContainerView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+    customViewContainer.arrangedSubviews.forEach { $0.removeFromSuperview()}
     didTapButton = nil
     
+    topOffset = .zero
+    headerViewSize = .zero
+    customViewContainer.alpha = 0
+  }
+  
+  override func updateConstraints() {
+    headerContainerView.heightAnchor.constraint(equalToConstant: headerViewSize.height).isActive = true
+    headerContainerView.widthAnchor.constraint(equalToConstant: headerViewSize.width).isActive = true
+    
+    contentView.topAnchor.constraint(equalTo: topAnchor,
+                                     constant: topOffset).isActive = true
+    contentView.leadingAnchor.constraint(equalTo: leadingAnchor,
+                                         constant: 0).isActive = true
+    contentView.trailingAnchor.constraint(equalTo: trailingAnchor,
+                                          constant: 0).isActive = true
+    contentView.bottomAnchor.constraint(equalTo: bottomAnchor,
+                                        constant: 0).isActive = true
+    
+    titleLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                        constant: 16).isActive = true
+    titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                         constant: -16).isActive = true
+    detailLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                         constant: 16).isActive = true
+    detailLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                         constant: -16).isActive = true
+    button.leadingAnchor.constraint(equalTo: contentView.leadingAnchor,
+                                         constant: 16).isActive = true
+    button.trailingAnchor.constraint(equalTo: contentView.trailingAnchor,
+                                         constant: -16).isActive = true
+    
+    customViewContainer.topAnchor.constraint(equalTo: topAnchor,
+                                             constant: topOffset).isActive = true
+    customViewContainer.leadingAnchor.constraint(equalTo: leadingAnchor,
+                                                 constant: 0).isActive = true
+    customViewContainer.trailingAnchor.constraint(equalTo: trailingAnchor,
+                                                  constant: 0).isActive = true
+    customViewContainer.bottomAnchor.constraint(equalTo: bottomAnchor,
+                                                constant: 0).isActive = true
+    
+    
+    super.updateConstraints()
   }
   
   @objc private func buttonClicked(sender: UIButton) {

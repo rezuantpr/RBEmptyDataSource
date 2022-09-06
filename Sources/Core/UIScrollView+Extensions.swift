@@ -5,9 +5,11 @@ extension UIScrollView {
   private struct AssociatedKeys {
     static var kEmptyBackgroundView = "RBEmptyBackgroundView"
     static var kEmptyDataSource = "RBEmptyDataSource"
+    static var kEmptyConfigDataSource = "RBEmptyConfigDataSource"
     static var kEmptyDelegate = "RBEmptyDelegate"
     static var kContentSizeObserveToken = "RBContentSizeObserveToken"
     static var kItemsCount = "RBEmptyDataSourceItemsCount"
+    static var kLoading = "RBEmptyDataSourceLoading"
   }
   
   var emptyBackgroundView: RBEmptyBackgroundView? {
@@ -52,6 +54,44 @@ extension UIScrollView {
       }
       
       objc_setAssociatedObject(self, &AssociatedKeys.kEmptyDataSource, WeakObjectContainer(with: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+      performObserving()
+    }
+  }
+  
+  // TODO
+  public var emptyConfigDataSource: RBEmptyConfigDataSource? {
+    get {
+      let container = objc_getAssociatedObject(self, &AssociatedKeys.kEmptyConfigDataSource) as? WeakObjectContainer
+      return container?.weakObject as? RBEmptyConfigDataSource
+    }
+    set {
+      if newValue == nil {
+        token?.invalidate()
+        token = nil
+        hideEmptyView()
+      }
+      
+      objc_setAssociatedObject(self, &AssociatedKeys.kEmptyConfigDataSource, WeakObjectContainer(with: newValue), .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
+      performObserving()
+    }
+  }
+  
+  // TODO
+  public var isLoading: Bool {
+    get {
+      let loading = objc_getAssociatedObject(self, &AssociatedKeys.kLoading) as? Bool
+      if loading == nil {
+        self.isLoading = false
+      }
+      return loading ?? false
+    }
+    set {
+//      if newValue == nil {
+        token?.invalidate()
+        token = nil
+        hideEmptyView()
+//      }
+      objc_setAssociatedObject(self, &AssociatedKeys.kLoading, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
       performObserving()
     }
   }
@@ -133,6 +173,31 @@ extension UIScrollView {
     isScrollEnabled = true
   }
   
+  private func setLoadingView() {
+    guard let emptyDataSource = emptyDataSource else { return }
+    let topOffset = emptyDataSource.topOffset(self)
+    let title = emptyDataSource.title(self)
+    let detail = emptyDataSource.detail(self)
+    let buttonTitle = emptyDataSource.buttonTitle(self, for: .normal)
+    let buttonHighlightedTitle = emptyDataSource.buttonTitle(self, for: .highlighted)
+    let headerView = emptyDataSource.headerView(self)
+    let headerViewSize = emptyDataSource.headerViewSize(self)
+    let customView = emptyDataSource.customView(self)
+    let spacing = emptyDataSource.spacing(self)
+    
+    let didTapButton: (UIButton) -> Void = { [weak self] button in
+      guard let self = self else { return }
+      self.emptyDelegate?.emptyDataSource(self, didTapButton: button)
+    }
+    
+    let loadingTitle = emptyDataSource.loadingTitle(self)
+    let customLoadingView = emptyDataSource.loadingCustomView(self)
+    
+    emptyBackgroundView?.set(isLoading: isLoading,
+                             loadingTitle: loadingTitle,
+                             customLoadingView: customLoadingView)
+  }
+  
   private func setView() {
     guard let emptyDataSource = emptyDataSource else { return }
     let topOffset = emptyDataSource.topOffset(self)
@@ -150,6 +215,10 @@ extension UIScrollView {
       self.emptyDelegate?.emptyDataSource(self, didTapButton: button)
     }
     
+    let loadingTitle = emptyDataSource.loadingTitle(self)
+    let customLoadingView = emptyDataSource.loadingCustomView(self)
+    
+//    let isLoading = isLoading && (self.itemsCount ?? 0) == 0
     emptyBackgroundView?.set(customView: customView,
                              topOffset: topOffset,
                              title: title,
@@ -159,7 +228,10 @@ extension UIScrollView {
                              buttonTitle: buttonTitle,
                              buttonHighlightedTitle: buttonHighlightedTitle,
                              spacing: spacing,
-                             didTapButton: didTapButton)
+                             didTapButton: didTapButton,
+                             isLoading: isLoading,
+                             loadingTitle: loadingTitle,
+                             customLoadingView: customLoadingView)
   }
   
   private func getItemsCount() -> Int {
