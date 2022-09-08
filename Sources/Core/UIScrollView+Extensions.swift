@@ -149,7 +149,7 @@ extension UIScrollView {
       if let view = self.emptyBackgroundView {
         self.layoutIfNeeded()
         view.isHidden = false
-        view.frame = self.frame
+        view.frame = self.bounds
         if view.superview == nil {
           if (self is UITableView) || (self is UICollectionView) || (self.subviews.count > 1) {
             self.insertSubview(view, at: 0)
@@ -173,31 +173,6 @@ extension UIScrollView {
     isScrollEnabled = true
   }
   
-  private func setLoadingView() {
-    guard let emptyDataSource = emptyDataSource else { return }
-    let topOffset = emptyDataSource.topOffset(self)
-    let title = emptyDataSource.title(self)
-    let detail = emptyDataSource.detail(self)
-    let buttonTitle = emptyDataSource.buttonTitle(self, for: .normal)
-    let buttonHighlightedTitle = emptyDataSource.buttonTitle(self, for: .highlighted)
-    let headerView = emptyDataSource.headerView(self)
-    let headerViewSize = emptyDataSource.headerViewSize(self)
-    let customView = emptyDataSource.customView(self)
-    let spacing = emptyDataSource.spacing(self)
-    
-    let didTapButton: (UIButton) -> Void = { [weak self] button in
-      guard let self = self else { return }
-      self.emptyDelegate?.emptyDataSource(self, didTapButton: button)
-    }
-    
-    let loadingTitle = emptyDataSource.loadingTitle(self)
-    let customLoadingView = emptyDataSource.loadingCustomView(self)
-    
-    emptyBackgroundView?.set(isLoading: isLoading,
-                             loadingTitle: loadingTitle,
-                             customLoadingView: customLoadingView)
-  }
-  
   private func setView() {
     guard let emptyDataSource = emptyDataSource else { return }
     let topOffset = emptyDataSource.topOffset(self)
@@ -215,10 +190,9 @@ extension UIScrollView {
       self.emptyDelegate?.emptyDataSource(self, didTapButton: button)
     }
     
-    let loadingTitle = emptyDataSource.loadingTitle(self)
-    let customLoadingView = emptyDataSource.loadingCustomView(self)
+    let loadingTitle = isLoading && (self.itemsCount ?? 0) == 0 ? emptyDataSource.loadingTitle(self) : nil
+    let customLoadingView = isLoading && (self.itemsCount ?? 0) == 0 ? emptyDataSource.loadingCustomView(self) : nil
     
-//    let isLoading = isLoading && (self.itemsCount ?? 0) == 0
     emptyBackgroundView?.set(customView: customView,
                              topOffset: topOffset,
                              title: title,

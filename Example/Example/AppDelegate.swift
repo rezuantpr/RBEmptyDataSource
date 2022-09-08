@@ -17,8 +17,26 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     window = UIWindow(frame: UIScreen.main.bounds)
     window?.makeKeyAndVisible()
-    window?.rootViewController = ViewController()
+    
+    let vc1 = ViewController()
+    let vc2 = ViewController()
+    vc1.navigationItem.title = "First"
+    vc2.navigationItem.title = "Second"
+      
+    let nvc1 = UINavigationController(rootViewController: vc1)
+    let nvc2 = UINavigationController(rootViewController: vc2)
+    
+    nvc1.navigationBar.prefersLargeTitles = true
+    
+    nvc1.tabBarItem = UITabBarItem(tabBarSystemItem: .topRated, tag: 0)
+    nvc2.tabBarItem = UITabBarItem(tabBarSystemItem: .mostViewed, tag: 0)
+    
+    let tabbar = UITabBarController()
+    tabbar.viewControllers = [nvc1, nvc2]
+    
     window?.backgroundColor = .white
+    
+    window?.rootViewController = tabbar
     return true
   }
 

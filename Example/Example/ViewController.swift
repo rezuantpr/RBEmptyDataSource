@@ -10,8 +10,9 @@ class ViewController: UIViewController {
   var token: Any?
   var token2: Any?
   
-  var button = UIButton()
-  var button2 = UIButton()
+  lazy var button1 = UIBarButtonItem(title: "Shuffle", style: .done, target: self, action:  #selector(click(sender:)))
+  lazy var button2 = UIBarButtonItem(title: "Loading", style: .done, target: self, action:  #selector(click2(sender:)))
+  
   override func viewDidLoad() {
     super.viewDidLoad()
     
@@ -19,19 +20,8 @@ class ViewController: UIViewController {
     tableView.delegate = self
     tableView.dataSource = self
     tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
-
-    button.setTitle("Shuffle", for: .normal)
-    button.backgroundColor = .blue
-    view.addSubview(button)
-    button.frame = CGRect(x: 15, y: 48, width: 200, height: 40)
-    button.addTarget(self, action: #selector(click(sender:)), for: .touchUpInside)
     
-    
-    button2.setTitle("Loading", for: .normal)
-    button2.backgroundColor = .blue
-    view.addSubview(button2)
-    button2.frame = CGRect(x: 216, y: 48, width: 180, height: 40)
-    button2.addTarget(self, action: #selector(click2(sender:)), for: .touchUpInside)
+    navigationItem.setRightBarButtonItems([button1, button2], animated: true)
     
     tableView.eds.setLoading(true)
     tableView.eds.setDataSource(self)
