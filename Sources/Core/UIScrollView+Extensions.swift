@@ -133,6 +133,11 @@ extension UIScrollView {
       guard let self = self else { return}
       let oldItemNumber = self.itemsCount ?? 0
       let newItemsNumber = self.getItemsCount()
+      
+      if newItemsNumber == oldItemNumber && self.itemsCount != nil {
+        return
+      }
+      
       if oldItemNumber == 0 && newItemsNumber != 0 {
         self.emptyDelegate?.emptyDataSourceWillDisappear(self)
       } else if (oldItemNumber != 0 || self.itemsCount == nil) && newItemsNumber == 0 {

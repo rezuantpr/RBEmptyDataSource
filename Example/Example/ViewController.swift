@@ -156,6 +156,6 @@ extension ViewController: RBEmptyDelegate {
 
 class ActivityView: UIView {
   deinit {
-    print("SUKA")
+    print(#function)
   }
 }
