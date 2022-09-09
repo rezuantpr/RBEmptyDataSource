@@ -30,8 +30,7 @@ public extension EDS where Base: UIScrollView {
   }
   
   func reloadData() {
-    base.hideEmptyView()
-    base.showEmptyView()
+    base.reloadEmptyView()
   }
   
   func setLoading(_ loading: Bool) {

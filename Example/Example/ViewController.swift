@@ -38,9 +38,10 @@ class ViewController: UIViewController {
   }
   
   @objc func click2(sender: Any) {
-    print(isLoading)
-    tableView.eds.setLoading(isLoading)
-    isLoading.toggle()
+//    print(isLoading)
+//    tableView.eds.setLoading(isLoading)
+//    isLoading.toggle()
+    tableView.eds.reloadData()
   }
   
   override func viewWillLayoutSubviews() {
@@ -134,6 +135,7 @@ extension ViewController: RBEmptyDataSource {
     indicator.heightAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
     indicator.widthAnchor.constraint(greaterThanOrEqualToConstant: 48).isActive = true
     
+    view.backgroundColor = .red
     indicator.startAnimating()
     return view
   }

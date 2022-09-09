@@ -148,7 +148,14 @@ extension UIScrollView {
     })
   }
   
-  func showEmptyView() {
+  func reloadEmptyView() {
+    token?.invalidate()
+    token = nil
+    hideEmptyView()
+    performObserving()
+  }
+  
+  private func showEmptyView() {
     guard emptyDataSource != nil else { return }
     DispatchQueue.main.async {
       if let view = self.emptyBackgroundView {
@@ -169,7 +176,7 @@ extension UIScrollView {
     }
   }
   
-  func hideEmptyView() {
+  private func hideEmptyView() {
     if let view = emptyBackgroundView {
       view.isHidden = true
       view.prepareForReuse()
