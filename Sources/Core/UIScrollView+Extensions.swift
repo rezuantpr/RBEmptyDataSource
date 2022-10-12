@@ -92,7 +92,7 @@ extension UIScrollView {
         hideEmptyView()
 //      }
       objc_setAssociatedObject(self, &AssociatedKeys.kLoading, newValue, .OBJC_ASSOCIATION_RETAIN_NONATOMIC)
-      performObserving()
+      performObserving(force: true)
     }
   }
   
@@ -121,20 +121,20 @@ extension UIScrollView {
     }
   }
   
-  private func performObserving() {
-    observeContentSize { [weak self] isEmpty in
+  private func performObserving(force: Bool = false) {
+    observeContentSize(force: force) { [weak self] isEmpty in
       guard let self = self else { return }
       isEmpty ? self.showEmptyView() : self.hideEmptyView()
     }
   }
   
-  private func observeContentSize(completion: @escaping (Bool) -> Void) {
+  private func observeContentSize(force: Bool, completion: @escaping (Bool) -> Void) {
     token = observe(\.contentSize, options: [.old, .new], changeHandler: {[weak self] scrollView, changed in
       guard let self = self else { return}
       let oldItemNumber = self.itemsCount ?? 0
       let newItemsNumber = self.getItemsCount()
       
-      if newItemsNumber == oldItemNumber && self.itemsCount != nil {
+      if newItemsNumber == oldItemNumber && self.itemsCount != nil && !force {
         return
       }
       
@@ -152,7 +152,7 @@ extension UIScrollView {
     token?.invalidate()
     token = nil
     hideEmptyView()
-    performObserving()
+    performObserving(force: true)
   }
   
   private func showEmptyView() {

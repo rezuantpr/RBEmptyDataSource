@@ -28,19 +28,19 @@ class ViewController: UIViewController {
     tableView.eds.setDelegate(self)
   }
 
-  var isLoading = true
+  var isLoading = false
   
   @objc func click(sender: Any) {
     let random = Int.random(in: 0...2)
     items = Array(repeating: "Word", count: random)
     tableView.reloadData()
-    
+    tableView.eds.reloadData()
   }
   
   @objc func click2(sender: Any) {
 //    print(isLoading)
-//    tableView.eds.setLoading(isLoading)
-//    isLoading.toggle()
+    tableView.eds.setLoading(isLoading)
+    isLoading.toggle()
     tableView.eds.reloadData()
   }
   
